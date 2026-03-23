@@ -1,0 +1,634 @@
+@font-face {
+    font-family: Supercell;
+    src: url(fonts/supercell-magic.ttf);
+}
+
+@import url(reset.css);
+
+* {
+    font-family: Supercell;
+    box-sizing: border-box;
+}
+
+.page__body {
+    background-image: url(img/background.png);
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.main {
+    margin: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/*
+.deck-col {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 15px;
+}
+
+.deck {
+    width: 350px;
+    height: 245px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.deck__header {
+    background-color: #002870;
+    width: 223px;
+    height: 32px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.deck__title {
+    text-align: center;
+    margin-bottom: 0;
+    margin-top: 9px;
+    font-size: 20px;
+}
+
+.deck__body {
+    width: 350px;
+    height: 214px;
+    background-color: #002870;
+    position: relative;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.card__list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 9px 11px 9px 11px;
+    row-gap: 19px;
+    column-gap: 7px;
+    justify-content: space-between;
+}
+
+.slot__frame {
+    width: 76px;
+    height: 90px;
+    background-color: #011a5d;
+    border-radius: 10px;
+}
+
+*/
+
+.characters {
+    width: 1166px;
+    align-items: center;
+    margin: 0 65px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.characters__list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
+    justify-content: space-between;
+}
+
+.character__frame {
+    position: relative;
+}
+
+/*** SECOND PAGE ***/
+
+.second-page__body {
+    background-image: url(img/second-page-bg.png);
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.secret__section {
+    width: 100%;
+    height: 350px;
+    padding-top: 50px;
+    padding-bottom: 25px;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.secret-card__container {
+    height: 239px;
+    position: relative;
+}
+
+.secret-card__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.secret-card__image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    z-index: 1;
+}
+
+.secret-card__item.is-active {
+    position: fixed !important;
+    margin: 0 !important;
+    top: 50% !important;
+    left: 830px !important;
+    transform: translate(50%, 50%) scale(3) rotate(0deg) !important;
+    z-index: 100 !important;
+}
+
+
+.secret-card__container.has-active-card::after {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.second-card {
+    z-index: 1;
+    position: absolute;
+}
+
+.secret-card__item {
+    height: 162px;
+    width: 115px;
+    position: absolute;
+    left: 50%;
+    transform-origin: center bottom;
+    perspective: 1400px;
+    cursor: pointer;
+    transition: all 1s ease;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.secret-card,
+.open-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+}
+
+.secret-card {
+    transform: rotateY(0deg);
+}
+
+.open-card {
+    transform: rotateY(180deg);
+}
+
+.card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+/* Карта готовится к "магическому" открытию */
+.secret-card__item.is-revealing {
+    animation: cardRevealPop 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 120 !important;
+}
+
+.secret-card__item.is-revealing .card-inner {
+    animation: cardRevealFlip 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.secret-card__item.is-revealing::before {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    border-radius: 20px;
+    background:
+        radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 28%, rgba(255,255,255,0) 70%);
+    filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    animation: revealGlow 0.95s ease-out forwards;
+    z-index: 0;
+}
+
+.secret-card__item.is-revealing .secret-card__image {
+    animation: revealShine 0.95s ease-out;
+}
+
+
+
+@keyframes cardRevealPop {
+    0% {
+        transform: translate(50%, 50%) scale(3) rotate(0deg);
+        filter: brightness(1);
+    }
+    18% {
+        transform: translate(50%, 50%) scale(3.22) rotate(0deg);
+        filter: brightness(1.15);
+    }
+    42% {
+        transform: translate(50%, 50%) scale(3.1) rotate(0deg);
+        filter: brightness(1.35);
+    }
+    70% {
+        transform: translate(50%, 50%) scale(3.28) rotate(0deg);
+        filter: brightness(1.08);
+    }
+    100% {
+        transform: translate(50%, 50%) scale(3) rotate(0deg);
+        filter: brightness(1);
+    }
+}
+
+@keyframes cardRevealFlip {
+    0% {
+        transform: rotateY(0deg) rotateZ(0deg);
+    }
+    20% {
+        transform: rotateY(0deg) rotateZ(-1deg);
+    }
+    48% {
+        transform: rotateY(90deg) rotateZ(0deg) scale(1.03);
+    }
+    60% {
+        transform: rotateY(180deg) rotateZ(1deg) scale(1.08);
+    }
+    78% {
+        transform: rotateY(180deg) rotateZ(-1deg) scale(0.98);
+    }
+    100% {
+        transform: rotateY(180deg) rotateZ(0deg) scale(1);
+    }
+}
+
+@keyframes revealGlow {
+    0% {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    20% {
+        opacity: 0.95;
+        transform: scale(1.18);
+    }
+    55% {
+        opacity: 0.75;
+        transform: scale(1.28);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.45);
+    }
+}
+
+@keyframes revealShine {
+    0% {
+        filter: brightness(1) saturate(1);
+    }
+    35% {
+        filter: brightness(1.35) saturate(1.25);
+    }
+    65% {
+        filter: brightness(1.15) saturate(1.4);
+    }
+    100% {
+        filter: brightness(1) saturate(1);
+    }
+}
+
+/* 1-я карта */
+.secret-card__list .secret-card__item:nth-child(1) {
+    margin-left: -460px;
+    top: 85px;
+    transform: translateX(-50%) rotate(-15deg);
+}
+
+/* 2-я карта */
+.secret-card__list .secret-card__item:nth-child(2) {
+    margin-left: -325px;
+    top: 55px;
+    transform: translateX(-50%) rotate(-10deg);
+}
+
+/* 3-я карта */
+.secret-card__list .secret-card__item:nth-child(3) {
+    margin-left: -195px;
+    top: 38px;
+    transform: translateX(-50%) rotate(-5deg);
+}
+
+/* 4-я карта */
+.secret-card__list .secret-card__item:nth-child(4) {
+    margin-left: -65px;
+    top: 30px;
+    transform: translateX(-50%) rotate(-1deg);
+}
+
+/* 5-я карта */
+.secret-card__list .secret-card__item:nth-child(5) {
+    margin-left: 65px;
+    top: 30px;
+    transform: translateX(-50%) rotate(1deg);
+}
+
+/* 6-я карта */
+.secret-card__list .secret-card__item:nth-child(6) {
+    margin-left: 195px;
+    top: 38px;
+    transform: translateX(-50%) rotate(5deg);
+}
+
+/* 7-я карта */
+.secret-card__list .secret-card__item:nth-child(7) {
+    margin-left: 325px;
+    top: 55px;
+    transform: translateX(-50%) rotate(10deg);
+}
+
+/* 8-я карта */
+.secret-card__list .secret-card__item:nth-child(8) {
+    margin-left: 460px;
+    top: 85px;
+    transform: translateX(-50%) rotate(15deg);
+}
+
+.deck__section {
+    margin-top: 75px;
+}
+
+.deck-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    row-gap: 53px;
+    justify-content: space-between;
+}
+
+.deck {
+    width: 450px;
+    height: 319px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.deck__header {
+    background-color: #002870;
+    width: 290px;
+    height: 42px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.deck__title {
+    text-align: center;
+    margin-bottom: 0;
+    margin-top: 12px;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+.deck__body {
+    width: 450px;
+    height: 277px;
+    background-color: #002870;
+    position: relative;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.card__list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 9px 11px 9px 11px;
+    row-gap: 19px;
+    column-gap: 7px;
+    justify-content: space-between;
+}
+
+.slot__frame {
+    width: 99px;
+    height: 117px;
+    background-color: #011a5d;
+    border-radius: 10px;
+}
+
+.first-deck {
+    color: #fff;
+    text-shadow:
+        2px 2px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+}
+
+.second-deck {
+    color: #ED2C2C;
+    text-shadow:
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff;
+}
+
+.third-deck {
+    color: #F6C627;
+    text-shadow:
+        2px 2px 0 #6B6B6B,
+        -2px -2px 0 #6B6B6B,
+        2px -2px 0 #6B6B6B,
+        -2px 2px 0 #6B6B6B,
+        2px 2px 0 #6B6B6B;
+}
+
+.fourth-deck {
+    color: #27A3E6;
+    text-shadow:
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff;
+}
+
+.fifth-deck {
+    color: #000;
+    text-shadow:
+        2px 2px 0 #D4D4D4,
+        -2px -2px 0 #D4D4D4,
+        2px -2px 0 #D4D4D4,
+        -2px 2px 0 #D4D4D4,
+        2px 2px 0 #D4D4D4;
+}
+
+
+.sixth-deck {
+    color: #22C01D;
+    text-shadow:
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff;
+}
+
+.seventh-deck {
+    color: #FF00EE;
+    text-shadow:
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff;
+}
+
+.eighth-deck {
+    color: #D77D00;
+    text-shadow:
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff;
+}
+
+.card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.slot__frame .secret-card__item {
+    position: relative !important; /* Отменяем абсолютное позиционирование веера */
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    width: 100%;  /* Карта заполняет весь слот */
+    height: 100%;
+    transform: none !important; /* Убираем наклоны дуги */
+    z-index: 1;
+}
+
+.active-deck {
+    transform: translateY(-6px);
+    box-shadow: 0 0 0 4px #fff, 0 0 20px rgba(255, 255, 255, 0.45);
+    border-radius: 10px;
+}
+
+.deck.deck-disabled {
+    cursor: not-allowed;
+}
+
+.deck:not(.deck-disabled) {
+    cursor: pointer;
+}
+
+.previous-page {
+    background-color: transparent;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.btn__link {
+    width: 20px;
+    height: 98vh;
+    background-color: transparent;
+    border: none;
+}
+
+.clear-decks-btn {
+    width: 99px;
+    height: 35px;
+    border-radius: 19px;
+    border: #000 solid 1px;
+    opacity: 0;
+}
+
+.undo-secret-card-btn {
+    width: 106px;
+    height: 35px;
+    border-radius: 19px;
+    border: #000 solid 1px;
+    opacity: 0;
+}
+
+.buttons {
+    display: flex;
+    width: 100vw;
+    justify-content: space-between;
+    position: absolute;
+    top: 25px;
+    padding: 0 25px;
+}
+
+.start-page {
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    padding: 485px 758px;
+    margin: 0;
+}
+
+.title__container {
+    width: 404px;
+    height: 110px;
+    padding: 31px 48px;
+}
+
+.page__title {
+    color: #fff;
+    padding: 0;
+    font-size: 48px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 100%;
+}
+
+.title-glow {
+    text-shadow:
+        0px 0px 30px rgba(255, 255, 255, 0.4),
+        0px 0px 60px rgba(255, 255, 255, 0.4),
+        0px 0px 90px rgba(255, 255, 255, 0.4),
+        0px 0px 120px rgba(255, 255, 255, 0.4),
+        0px 0px 30px rgba(255, 255, 255, 0.4);
+}
+
+.start-page__body {
+    padding: 0;
+    margin: 0;
+}

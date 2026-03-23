@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="animation.css">
+     <link rel="prefetch" href="second-page.html" as="document">
+    <title>Document</title>
+</head>
+
+<body class="start-page__body">
+    <!-- Контейнер заставки (Изначально черный экран) -->
+    <div id="startup-screen">
+
+        <!-- Подсказка до нажатия пробела -->
+        <div id="press-space-hint" class="blink-text">НАЖМИТЕ ПРОБЕЛ</div>
+
+        <!-- ФАЗА 2: Экран загрузки (Скрыт) -->
+        <div class="loading-phase">
+            <!--<div class="logo__container">
+                <img src="img/logo.png" alt="" class="logo">
+            </div> -->
+
+            <!-- Полоса загрузки в самом низу -->
+            <div class="progress-wrapper">
+                <!-- Текст с процентами -->
+                <div class="progress-text" id="loading-text">0%</div>
+
+                <!-- Сама полоска -->
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+        </div>
+        <!-- ФАЗА 1: Экран Supercell (Скрыт) -->
+        <div class="supercell-phase">
+            <h1 class="sc-logo">БАУМАНЕЦ</h1>
+        </div>
+
+    </div>
+    <script src="animatiom.js"></script>
+</body>
+
+</html>
