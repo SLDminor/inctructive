@@ -1,5 +1,16 @@
 const characterImages = document.querySelectorAll('.character__image');
 
+const TEAM_COLORS = {
+    'color-one': '#ffffff',
+    'color-two': '#ED2C2C',
+    'color-three': '#F6C627',
+    'color-four': '#27A3E6',
+    'color-five': '#000000',
+    'color-six': '#22C01D',
+    'color-seven': '#FF00EE',
+    'color-eight': '#D77D00'
+};
+
 let activePopoverContainer = null;
 let activeTrigger = null;
 
@@ -24,8 +35,33 @@ function createPopoverContent(image) {
     `;
 }
 
+function getStorageData() {
+    return JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+}
+
+function applyCharacterColor(image, team) {
+    const characterItem = image.closest('.character__item');
+    const color = TEAM_COLORS[team];
+
+    if (!characterItem || !color) return;
+
+    characterItem.style.setProperty('--team-color', color);
+    characterItem.setAttribute('data-team-color', 'true');
+}
+
+function restoreCharacterColors() {
+    const data = getStorageData();
+
+    data.characters.forEach(character => {
+        const image = document.getElementById(character.id);
+        if (!image) return;
+
+        applyCharacterColor(image, character.team);
+    });
+}
+
 function removeCharacter(id) {
-    const data = JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+    const data = getStorageData();
 
     data.characters = data.characters.filter(c => c.id !== id);
 
@@ -33,7 +69,7 @@ function removeCharacter(id) {
 }
 
 function canAddMoreCharacters() {
-    const data = JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+    const data = getStorageData();
     return data.characters.length < 7;
 }
 
@@ -50,12 +86,10 @@ function closePopover() {
 }
 
 function saveCharacter(id, image, team) {
-    const data = JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+    const data = getStorageData();
 
-    // удаляем старую запись
     data.characters = data.characters.filter(c => c.id !== id);
 
-    // добавляем новую
     data.characters.push({
         id,
         image,
@@ -81,27 +115,22 @@ function positionPopover(trigger, popoverContainer, popoverElement) {
     let top = targetRect.top - popoverContainer.offsetHeight - gap;
     let left = targetRect.left + (targetRect.width / 2) - (popoverContainer.offsetWidth / 2);
 
-    // По умолчанию открываем сверху, стрелка вниз
     popoverElement.classList.add('arrow-bottom');
 
-    // Если не помещается сверху — открываем снизу
     if (top < 8) {
         top = targetRect.bottom + gap;
         popoverElement.classList.remove('arrow-bottom');
         popoverElement.classList.add('arrow-top');
     }
 
-    // Если вылезает справа — прижимаем к правому краю
     if (left + popoverContainer.offsetWidth > viewportWidth - 8) {
         left = viewportWidth - popoverContainer.offsetWidth - 8;
     }
 
-    // Если вылезает слева — прижимаем к левому краю
     if (left < 8) {
         left = 8;
     }
 
-    // Если не помещается ни сверху, ни снизу — пробуем справа
     const fitsAbove = targetRect.top - popoverContainer.offsetHeight - gap >= 8;
     const fitsBelow = targetRect.bottom + popoverContainer.offsetHeight + gap <= viewportHeight - 8;
 
@@ -137,42 +166,32 @@ function openPopover(trigger) {
     const popoverElement = document.createElement('div');
     popoverElement.className = 'popover';
     popoverElement.innerHTML = createPopoverContent(trigger);
+
     popoverElement.querySelectorAll('.popover__color').forEach(colorBtn => {
         colorBtn.addEventListener('click', () => {
             const id = trigger.id;
-            const teamval = colorBtn.classList[1]; // color-one, color-two...
+            const teamval = colorBtn.classList[1];
 
-            const data = JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+            const data = getStorageData();
 
-            // сколько уже в этой команде
             const teamCount = data.characters.filter(c => c.team === teamval).length;
-
-            // есть ли уже этот персонаж
             const alreadyExists = data.characters.some(c => c.id === id);
 
-            // если это новый персонаж и команда уже заполнена
             if (!alreadyExists && teamCount >= 7) {
                 alert('В этой команде уже 7 персонажей');
                 return;
             }
-            const color = window.getComputedStyle(colorBtn).backgroundColor;
 
-            // сохраняем цвет в data-атрибут
-            trigger.closest('.character__item')
-                .style.setProperty('--team-color', color);
-
-            trigger.closest('.character__item')
-                .setAttribute('data-team-color', 'true');
-
-            // --- СОХРАНЕНИЕ ---
-            const imageSrc = trigger.getAttribute('src');
-
-            // определяем номер команды (1-8)
             const team = Array.from(colorBtn.classList)
                 .find(cls => cls.startsWith('color-'));
 
+            applyCharacterColor(trigger, team);
+
+            const imageSrc = trigger.getAttribute('src');
+
             saveCharacter(id, imageSrc, team);
-            // закрываем поповер
+            updateCharactersState();
+
             closePopover();
         });
     });
@@ -189,19 +208,18 @@ function openPopover(trigger) {
     popoverElement.querySelector('.popover__remove').addEventListener('click', () => {
         const characterItem = trigger.closest('.character__item');
 
-        // убираем цвет
         characterItem.style.removeProperty('--team-color');
         characterItem.removeAttribute('data-team-color');
 
-        // удаляем из localStorage
         removeCharacter(trigger.id);
+        updateCharactersState();
 
         closePopover();
     });
 }
 
 function updateCharactersState() {
-    const data = JSON.parse(localStorage.getItem('teamsData')) || { characters: [] };
+    const data = getStorageData();
 
     if (data.characters.length >= 7) {
         document.querySelectorAll('.character__image').forEach(img => {
@@ -209,6 +227,8 @@ function updateCharactersState() {
 
             if (!exists) {
                 img.classList.add('disabled');
+            } else {
+                img.classList.remove('disabled');
             }
         });
     } else {
@@ -259,3 +279,6 @@ window.addEventListener('scroll', () => {
 
     positionPopover(activeTrigger, activePopoverContainer, popoverElement);
 }, true);
+
+restoreCharacterColors();
+updateCharactersState();
