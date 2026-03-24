@@ -6,6 +6,83 @@ const undoSecretCardBtn = document.querySelector('.undo-secret-card-btn');
 
 let lastMovedCardInfo = null;
 
+function getFanCards() {
+    return Array.from(secretCardList.querySelectorAll(':scope > .secret-card__item'));
+}
+
+function resetFanCardStyles(card) {
+    card.style.left = '';
+    card.style.top = '';
+    card.style.marginLeft = '';
+    card.style.transform = '';
+    card.style.zIndex = '';
+}
+
+function layoutSecretCards() {
+    const fanCards = getFanCards();
+    const count = fanCards.length;
+
+    // Когда все 8 карт на месте — оставляем исходную CSS-дугу
+    if (count === 8) {
+        fanCards.forEach(resetFanCardStyles);
+        return;
+    }
+
+    const maxOffsetMap = {
+        7: 380,
+        6: 310,
+        5: 245,
+        4: 180,
+        3: 120,
+        2: 60,
+        1: 0
+    };
+
+    const maxRotationMap = {
+        7: 13,
+        6: 11,
+        5: 9,
+        4: 7,
+        3: 5,
+        2: 3,
+        1: 0
+    };
+
+    const maxTopMap = {
+        7: 76,
+        6: 68,
+        5: 58,
+        4: 50,
+        3: 42,
+        2: 35,
+        1: 30
+    };
+
+    const maxOffset = maxOffsetMap[count] ?? 180;
+    const maxRotation = maxRotationMap[count] ?? 7;
+    const minTop = 30;
+    const maxTop = maxTopMap[count] ?? 50;
+
+    fanCards.forEach((card, index) => {
+        if (card.classList.contains('is-active')) return;
+
+        const middle = (count - 1) / 2;
+        const ratio = middle === 0 ? 0 : (index - middle) / middle;
+
+        const offsetX = ratio * maxOffset;
+        const rotation = ratio * maxRotation;
+        const top =
+            minTop +
+            Math.pow(Math.abs(ratio), 1.45) * (maxTop - minTop);
+
+        card.style.left = '50%';
+        card.style.marginLeft = '0';
+        card.style.top = `${top}px`;
+        card.style.transform = `translateX(calc(-50% + ${offsetX}px)) rotate(${rotation}deg)`;
+        card.style.zIndex = `${100 + index}`;
+    });
+}
+
 function getLastSlot(deck) {
     const allSlots = deck.querySelectorAll('.slot__frame');
     return allSlots[allSlots.length - 1] || null;
@@ -78,13 +155,15 @@ function FLIP_moveToSlot(movingCard) {
     movingCard.classList.remove('is-active');
 
     lastMovedCardInfo = {
-    card: movingCard,
-    fromParent: secretCardList,
-    nextSibling: movingCard.nextElementSibling
-};
+        card: movingCard,
+        fromParent: secretCardList,
+        nextSibling: movingCard.nextElementSibling
+    };
 
 
     targetSlot.appendChild(movingCard);
+
+    layoutSecretCards();
 
     const lastRect = movingCard.getBoundingClientRect();
 
@@ -127,14 +206,12 @@ function returnLastSecretCard() {
     const { card, fromParent, nextSibling } = lastMovedCardInfo;
     const innerCard = card.querySelector('.card-inner');
 
-    // Возвращаем карту обратно в веер
     if (nextSibling && nextSibling.parentNode === fromParent) {
         fromParent.insertBefore(card, nextSibling);
     } else {
         fromParent.appendChild(card);
     }
 
-    // Сбрасываем состояния карты
     card.classList.remove('is-active', 'is-revealing');
 
     if (innerCard) {
@@ -144,6 +221,8 @@ function returnLastSecretCard() {
     card.style.transition = '';
     card.style.transform = '';
     card.style.transformOrigin = '';
+
+    layoutSecretCards();
 
     if (container) {
         container.classList.remove('has-active-card');
@@ -213,5 +292,9 @@ if (cards.length > 0) {
 if (undoSecretCardBtn) {
     undoSecretCardBtn.addEventListener('click', returnLastSecretCard);
 }
+
+layoutSecretCards();
+
+window.addEventListener('resize', layoutSecretCards);
 
 updateDeckStates();
