@@ -196,9 +196,10 @@
     bottom: 0;
     width: 100%;
     height: 49px; /* Толщина полосы */
-    background-color: #3b4c9b; /* Темно-синий бортик */
+    background-color: #000; /* Темно-синий бортик */
     border-top: 1px solid #000; /* Верхняя черная линия */
     box-sizing: border-box;
+    border-radius: 5px;
 }
 
 /* Светло-сиреневая заполняющаяся часть */
@@ -207,6 +208,7 @@
     width: 0%; /* Старт с нуля */
     background-color: #3C54AA; /* Цвет как на макете */
     border-top: 15px solid #859BEA; /* Светлый блик сверху */
+    border-radius: 5px;
     box-sizing: border-box;
     /* Анимация заполнения (3 секунды) начнется через 2.5 сек (после фазы Supercell) */
     animation: fillBar 5s ease-out 2.5s forwards; 
