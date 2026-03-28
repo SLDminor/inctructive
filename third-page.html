@@ -9,6 +9,8 @@
 </head>
 
 <body class="second-page__body">
+    <div class="decks-viewport-fit">
+    <div class="decks-viewport-fit__inner">
     <div class="secret__section">
         <div class="secret-card__container">
             <ul class="secret-card__list">
@@ -373,15 +375,15 @@
             </div>
         </div>
     </div>
+    </div>
+    </div>
 
     <div class="previous-page">
-        <a href="second-page.html">
-            <button class="btn__link"></button>
-        </a>
+        <a class="btn__link" href="second-page.html" aria-label="Назад к коллекции карт"></a>
     </div>
     <div class="buttons">
         <button class="undo-secret-card-btn" type="button">Возврат</button>
-        <button class="clear-decks-btn">Сброс</button>
+        <button class="clear-decks-btn" type="button" aria-label="Сбросить распределение карт по колодам">Сброс колод</button>
     </div>
 
     <script src="script.js"></script>

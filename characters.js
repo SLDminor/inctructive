@@ -1,6 +1,6 @@
 const characterImages = document.querySelectorAll('.character__image');
 
-const TEAM_COLORS = {
+const TEAM_GLOW_COLORS = {
     'color-one': '#ffffff',
     'color-two': '#ED2C2C',
     'color-three': '#F6C627',
@@ -41,11 +41,11 @@ function getStorageData() {
 
 function applyCharacterColor(image, team) {
     const characterItem = image.closest('.character__item');
-    const color = TEAM_COLORS[team];
+    const glow = TEAM_GLOW_COLORS[team];
 
-    if (!characterItem || !color) return;
+    if (!characterItem || !glow) return;
 
-    characterItem.style.setProperty('--team-color', color);
+    characterItem.style.setProperty('--team-glow', glow);
     characterItem.setAttribute('data-team-color', 'true');
 }
 
@@ -231,7 +231,7 @@ function openPopover(trigger) {
     popoverElement.querySelector('.popover__remove').addEventListener('click', () => {
         const characterItem = trigger.closest('.character__item');
 
-        characterItem.style.removeProperty('--team-color');
+        characterItem.style.removeProperty('--team-glow');
         characterItem.removeAttribute('data-team-color');
 
         removeCharacter(trigger.id);
@@ -248,6 +248,8 @@ function updateCharactersState() {
 }
 
 characterImages.forEach((image) => {
+    image.setAttribute('tabindex', '0');
+
     image.addEventListener('click', (event) => {
         event.stopPropagation();
 

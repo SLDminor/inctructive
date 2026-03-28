@@ -6,6 +6,75 @@ const undoSecretCardBtn = document.querySelector('.undo-secret-card-btn');
 
 let lastMovedCardInfo = null;
 
+function updateUndoButtonState() {
+    /* кнопка «Возврат» скрыта; при показе — ориентироваться на lastMovedCardInfo */
+}
+
+function ensureSecretCardIndices() {
+    if (!secretCardList) return;
+    [...secretCardList.querySelectorAll(':scope > .secret-card__item')].forEach((el, i) => {
+        if (el.querySelector('.card-inner') && el.dataset.secretIndex === undefined) {
+            el.dataset.secretIndex = String(i);
+        }
+    });
+}
+
+/** Сброс localStorage колод, слотов и секретных карт (рубашка, веер, порядок). Вызывается с deck.js */
+function resetThirdPageDecksAndSecretCards() {
+    if (!secretCardList) return;
+
+    try {
+        localStorage.removeItem('teamsData');
+    } catch (e) {
+        /* ignore */
+    }
+
+    document.querySelectorAll('.slot__frame').forEach((slot) => {
+        slot.querySelectorAll('.secret-card__item').forEach((card) => {
+            if (!card.querySelector('.card-inner')) {
+                card.remove();
+            }
+        });
+    });
+
+    const fanSecrets = [...document.querySelectorAll('.secret-card__item')].filter((c) =>
+        c.querySelector('.card-inner')
+    );
+    fanSecrets.sort(
+        (a, b) => Number(a.dataset.secretIndex || 0) - Number(b.dataset.secretIndex || 0)
+    );
+
+    fanSecrets.forEach((card) => {
+        card.classList.remove('is-active', 'is-revealing');
+        const innerCard = card.querySelector('.card-inner');
+        if (innerCard) {
+            innerCard.classList.remove('is-flipped');
+        }
+        card.style.transition = '';
+        card.style.transform = '';
+        card.style.transformOrigin = '';
+        resetFanCardStyles(card);
+        secretCardList.appendChild(card);
+    });
+
+    lastMovedCardInfo = null;
+    updateUndoButtonState();
+
+    if (container) {
+        container.classList.remove('has-active-card');
+    }
+
+    clearActiveDeck();
+    document.querySelectorAll('.deck').forEach((deck) => {
+        deck.classList.remove('active-deck', 'deck-disabled');
+    });
+
+    layoutSecretCards();
+    updateDeckStates();
+}
+
+window.resetThirdPageDecksAndSecretCards = resetThirdPageDecksAndSecretCards;
+
 function getFanCards() {
     return Array.from(secretCardList.querySelectorAll(':scope > .secret-card__item'));
 }
@@ -293,6 +362,7 @@ if (undoSecretCardBtn) {
     undoSecretCardBtn.addEventListener('click', returnLastSecretCard);
 }
 
+ensureSecretCardIndices();
 layoutSecretCards();
 
 window.addEventListener('resize', layoutSecretCards);
